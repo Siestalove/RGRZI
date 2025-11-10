@@ -1,0 +1,40 @@
+# Сборочные директории
+build/
+build-*/
+*.build/
+
+# Исполняемые файлы
+fiat_shamir_server
+fiat_shamir_client
+server/fiat_shamir_server
+client/fiat_shamir_client
+
+# Файлы Qt
+*.pro.user*
+*.qmake.stash
+Makefile
+*.app
+*.dSYM/
+
+# Файлы данных сервера
+users.json
+*.log
+
+# Временные файлы
+*.tmp
+*.temp
+*~
+
+# Файлы IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
