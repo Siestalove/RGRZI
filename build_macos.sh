@@ -34,20 +34,43 @@ if ! command -v cmake &> /dev/null; then
     exit 1
 fi
 
-# Установка переменных окружения для OpenSSL
-export LDFLAGS="-L/usr/local/opt/openssl/lib"
-export CPPFLAGS="-I/usr/local/opt/openssl/include"
-export PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig"
+# Установка переменных окружения для OpenSSL и Qt
+if [ -d "/opt/homebrew" ]; then
+    # Apple Silicon (M1/M2)
+    export LDFLAGS="-L/opt/homebrew/opt/openssl/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/openssl/include"
+    export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl/lib/pkgconfig"
+    export CMAKE_PREFIX_PATH="/opt/homebrew"
+    export PATH="/opt/homebrew/bin:/opt/homebrew/opt/qt/bin:$PATH"
+    QT_PATH="/opt/homebrew/Cellar/qt/6.9.3"
+else
+    # Intel Mac
+    export LDFLAGS="-L/usr/local/opt/openssl/lib"
+    export CPPFLAGS="-I/usr/local/opt/openssl/include"
+    export PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig"
+    export CMAKE_PREFIX_PATH="/usr/local"
+    export PATH="/usr/local/bin:/usr/local/opt/qt/bin:$PATH"
+    QT_PATH="/usr/local/Cellar/qt/6.9.3"
+fi
 
 # Поиск Qt
 if command -v qmake6 &> /dev/null; then
     QMAKE_CMD="qmake6"
-else
+elif command -v qmake &> /dev/null; then
     QMAKE_CMD="qmake"
+else
+    # Пробуем прямой путь
+    if [ -f "$QT_PATH/bin/qmake" ]; then
+        QMAKE_CMD="$QT_PATH/bin/qmake"
+    else
+        echo "❌ qmake не найден"
+        exit 1
+    fi
 fi
 
 echo "✅ Зависимости найдены"
 echo "🔨 Используем qmake: $QMAKE_CMD"
+echo "🔨 Qt путь: $QT_PATH"
 
 # Создание директории сборки
 mkdir -p build
@@ -55,7 +78,7 @@ cd build
 
 # Сборка с помощью CMake (предпочтительный способ)
 echo "🏗️ Сборка с помощью CMake..."
-cmake .. -DCMAKE_PREFIX_PATH="$(dirname $(dirname $($QMAKE_CMD -query QT_INSTALL_HEADERS)))"
+cmake .. -DCMAKE_PREFIX_PATH="$QT_PATH" -DQt6_ROOT="$QT_PATH"
 make
 
 if [ $? -eq 0 ]; then

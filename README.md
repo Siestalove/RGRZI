@@ -35,52 +35,59 @@
 
 ## Сборка на macOS
 
-### Способ 1: Использование CMake (рекомендуется)
+### 🎯 Ваш случай: Qt 6.9.3 уже установлен через Homebrew
 
-1. **Установка зависимостей**:
+Если у вас Qt установлен в `/opt/homebrew/Cellar/qt/6.9.3/`:
+
 ```bash
-# Установка Qt6
-brew install qt@6
-
-# Установка OpenSSL
-brew install openssl
-
-# Установка CMake
-brew install cmake
+# Быстрая сборка
+export PATH="/opt/homebrew/Cellar/qt/6.9.3/bin:$PATH"
+cd server && /opt/homebrew/Cellar/qt/6.9.3/bin/qmake && make && cd ../client && /opt/homebrew/Cellar/qt/6.9.3/bin/qmake && make
 ```
 
-2. **Сборка проекта**:
+### Способ 1: Использование готовых скриптов
+
 ```bash
-mkdir build
-cd build
-cmake ..
-make
+# Автоматическая сборка (адаптируйте под ваш Qt)
+./build_qmake.sh
 ```
 
-3. **Запуск**:
-```bash
-# Запуск сервера
-./fiat_shamir_server
+### Способ 2: Ручная сборка с указанием путей
 
-# Запуск клиента (в другом терминале)
-./fiat_shamir_client
+1. **Установка переменных окружения**:
+```bash
+export PATH="/opt/homebrew/Cellar/qt/6.9.3/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/openssl/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/openssl/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl/lib/pkgconfig"
 ```
 
-### Способ 2: Использование qmake
-
-1. **Сборка сервера**:
+2. **Сборка сервера**:
 ```bash
 cd server
 qmake server.pro
 make
 ```
 
-2. **Сборка клиента**:
+3. **Сборка клиента**:
 ```bash
 cd ../client
 qmake client.pro
 make
 ```
+
+### Способ 3: Использование CMake
+
+```bash
+mkdir build
+cd build
+cmake .. -DCMAKE_PREFIX_PATH="/opt/homebrew/Cellar/qt/6.9.3"
+make
+```
+
+### 📱 Подробная инструкция
+
+Смотрите `INSTRUCTIONS_MACOS.md` для подробных инструкций по вашей конфигурации.
 
 ## Использование приложения
 
